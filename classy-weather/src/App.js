@@ -1,5 +1,39 @@
 import React from "react";
 
+function getWeatherIcon(wmoCode) {
+  const icons = new Map([
+    [[0], "☀️"],
+    [[1], "🌤"],
+    [[2], "⛅️"],
+    [[3], "☁️"],
+    [[45, 48], "🌫"],
+    [[51, 56, 61, 66, 80], "🌦"],
+    [[53, 55, 63, 65, 57, 67, 81, 82], "🌧"],
+    [[71, 73, 75, 77, 85, 86], "🌨"],
+    [[95], "🌩"],
+    [[96, 99], "⛈"],
+  ]);
+  const arr = [...icons.keys()].find((key) => key.includes(wmoCode));
+  if (!arr) return "NOT FOUND";
+  return icons.get(arr);
+}
+
+function addOneDayAndGetWeekday(date) {
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const newDate = new Date(date);
+  newDate.setDate(newDate.getDate() + 1);
+  const dayIndex = newDate.getDay();
+  return daysOfWeek[dayIndex];
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -21,7 +55,6 @@ class App extends React.Component {
         `https://geocoding-api.open-meteo.com/v1/search?name=${this.state.location}`
       );
       const geoData = await geoRes.json();
-      console.log(geoData);
 
       if (!geoData.results) throw new Error("Location not found");
 
@@ -30,6 +63,7 @@ class App extends React.Component {
       this.setState({ displayLocation: name });
 
       // 2) Getting actual weather
+
       const weatherRes = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&timezone=${timezone}&daily=weathercode,temperature_2m_max,temperature_2m_min`
       );
@@ -73,6 +107,7 @@ export default App;
 
 class Weather extends React.Component {
   render() {
+    console.log(new Date("2025/03/24"));
     const {
       temperature_2m_max: max,
       temperature_2m_min: min,
@@ -90,6 +125,7 @@ class Weather extends React.Component {
               min={min.at(i)}
               code={code.at(i)}
               key={i}
+              isToday={i === 0}
             />
           ))}
         </ul>
@@ -100,6 +136,15 @@ class Weather extends React.Component {
 
 class Day extends React.Component {
   render() {
-    return <li>Day</li>;
+    const { max, min, date, code, isToday } = this.props;
+    return (
+      <li className="day">
+        <span>{getWeatherIcon(code)}</span>
+        <p>{isToday ? "Today" : addOneDayAndGetWeekday(date)}</p>
+        <p>
+          {min}&deg; &mdash; {max}&deg;
+        </p>
+      </li>
+    );
   }
 }
