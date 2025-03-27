@@ -69,6 +69,10 @@ export default function App() {
     setSelectedId(null);
   }
 
+  function handleAddingWachedMovie(movie) {
+    setWatched((mov) => [...mov, movie]);
+  }
+
   useEffect(
     function () {
       async function getMovies() {
@@ -118,7 +122,12 @@ export default function App() {
         </Box>
         <Box>
           {selectedId ? (
-            <MovieDetails selectedId={selectedId} onClose={handleCloseMovie} />
+            <MovieDetails
+              selectedId={selectedId}
+              onClose={handleCloseMovie}
+              onAddMovie={handleAddingWachedMovie}
+              watched={watched}
+            />
           ) : (
             <>
               <Summary watched={watched} />
@@ -217,11 +226,17 @@ function Movie({ movie, onSelectedId }) {
   );
 }
 
-function MovieDetails({ selectedId, onClose }) {
+function MovieDetails({ selectedId, onClose, onAddMovie, watched }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
+
+  console.log(isWatched);
   const {
     Title: title,
     Poster: image,
@@ -232,7 +247,23 @@ function MovieDetails({ selectedId, onClose }) {
     Runtime: runtime,
     Actors: actors,
     Plot: plot,
+    Year: year,
   } = movie;
+
+  function addNewMovie() {
+    const newMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      image,
+      ratings: Number(ratings),
+      runtime: Number(runtime.split(" ").at(0)),
+      userRating: Number(userRating),
+    };
+
+    onAddMovie(newMovie);
+    onClose();
+  }
 
   useEffect(
     function () {
@@ -279,11 +310,22 @@ function MovieDetails({ selectedId, onClose }) {
 
           <section>
             <div className="rating">
-              <StarRating
-                maxRating={10}
-                size={24}
-                onSetRating={setUserRating}
-              />
+              {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={addNewMovie}>
+                      + Add to List
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You rated this movie : {watchedUserRating}⭐</p>
+              )}
             </div>
             <p>
               <em>{plot}</em>
@@ -298,7 +340,9 @@ function MovieDetails({ selectedId, onClose }) {
 }
 
 function Summary({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
+  const avgImdbRating = Math.round(
+    average(watched.map((movie) => movie.ratings))
+  );
   const avgUserRating = average(watched.map((movie) => movie.userRating));
   const avgRuntime = average(watched.map((movie) => movie.runtime));
   return (
@@ -339,12 +383,12 @@ function WatchedMoviesList({ watched }) {
 function WatchedMovie({ movie }) {
   return (
     <li>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.image} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
-          <span>{movie.imdbRating}</span>
+          <span>{movie.ratings}</span>
         </p>
         <p>
           <span>🌟</span>
