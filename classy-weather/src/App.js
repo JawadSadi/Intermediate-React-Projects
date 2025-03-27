@@ -31,25 +31,22 @@ function addOneDayAndGetWeekday(date) {
   const newDate = new Date(date);
   newDate.setDate(newDate.getDate() + 1);
   const dayIndex = newDate.getDay();
-  return daysOfWeek[dayIndex];
+  return daysOfWeek[dayIndex].slice(0, 3);
 }
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+  state = {
+    location: "",
+    isLoading: false,
+    displayLocation: "",
+    weather: {},
+  };
 
-    this.state = {
-      location: "lisbon",
-      isLoading: false,
-      displayLocation: "",
-      weather: {},
-    };
-    this.fetchWeather = this.fetchWeather.bind(this);
-  }
+  fetchWeather = async () => {
+    if (this.state.location.length < 2) return;
 
-  async fetchWeather() {
-    this.setState({ isLoading: true });
     try {
+      this.setState({ isLoading: true });
       // 1) Getting location (geocoding)
       const geoRes = await fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${this.state.location}`
@@ -70,9 +67,23 @@ class App extends React.Component {
       const weatherData = await weatherRes.json();
       this.setState({ weather: weatherData.daily });
     } catch (err) {
-      console.err(err);
+      console.error(err);
     } finally {
       this.setState({ isLoading: false });
+    }
+  };
+
+  getInput = (e) => this.setState({ location: e.target.value });
+
+  componentDidMount() {
+    this.setState({ location: localStorage.getItem("location") || "" });
+  }
+
+  componentDidUpdate(preProps, prevState) {
+    if (this.state.location !== prevState.location) {
+      this.fetchWeather();
+
+      localStorage.setItem("location", this.state.location);
     }
   }
 
@@ -80,16 +91,7 @@ class App extends React.Component {
     return (
       <div className="app">
         <h1>Classy Weather</h1>
-        <div>
-          <input
-            type="text"
-            placeholder="Search For Location..."
-            value={this.state.location}
-            onChange={(e) => this.setState({ location: e.target.value })}
-          />
-        </div>
-        <button onClick={this.fetchWeather}>Get weather</button>
-
+        <Input onChange={this.getInput} location={this.state.location} />
         {this.state.isLoading && <p className="loader">Loadin...</p>}
 
         {this.state.weather.weathercode && (
@@ -104,6 +106,21 @@ class App extends React.Component {
 }
 
 export default App;
+
+class Input extends React.Component {
+  render() {
+    return (
+      <div>
+        <input
+          type="text"
+          placeholder="Search For Location..."
+          value={this.props.location}
+          onChange={this.props.onChange}
+        />
+      </div>
+    );
+  }
+}
 
 class Weather extends React.Component {
   render() {
