@@ -1,12 +1,13 @@
 import React from "react";
 import "./Product.css";
-import { AiFillStar } from "react-icons/ai";
-import { BsBagHeartFill } from "react-icons/bs";
+import Card from "../components/Card";
 
 export default function Product() {
   return (
     <>
-      <section className="card-container"></section>
+      <section className="card-container">
+        <Card />
+      </section>
     </>
   );
 }
