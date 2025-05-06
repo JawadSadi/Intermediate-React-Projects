@@ -7,6 +7,7 @@ import SideBar from "./SideBar/SideBar";
 export default function App() {
   return (
     <div>
+      <SideBar />
       <Nav />
       <Recommended />
       <Product />
