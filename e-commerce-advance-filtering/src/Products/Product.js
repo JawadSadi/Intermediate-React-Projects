@@ -1,13 +1,10 @@
 import React from "react";
 import "./Product.css";
-import Card from "../components/Card";
 
-export default function Product() {
+export default function Product({ result }) {
   return (
     <>
-      <section className="card-container">
-        <Card />
-      </section>
+      <section className="card-container">{result}</section>
     </>
   );
 }

@@ -18,8 +18,10 @@ export default function App() {
     setQuery(event.target.value);
   }
 
-  const filtredItems = products.filter((product) =>
-    product.title.toLocaleLowerCase().indexOf(query.toLocaleLowerCase() !== 1)
+  const filtredItems = products.filter(
+    (product) =>
+      product.title.toLocaleLowerCase().indexOf(query.toLocaleLowerCase()) !==
+      -1
   );
 
   // Radio Filter
@@ -31,6 +33,7 @@ export default function App() {
   // Buttons Filter
 
   function handleClick(event) {
+    console.log(event.target.value);
     setSelectedCategory(event.target.value);
   }
 
@@ -43,6 +46,7 @@ export default function App() {
     }
 
     // Selected Filter
+
     if (selected) {
       filtredProducts = filtredProducts.filter(
         ({ category, company, color, newPrice, title }) =>
@@ -73,9 +77,9 @@ export default function App() {
   return (
     <div>
       <SideBar handleCategory={handleCategory} />
-      <Nav />
-      <Recommended />
-      <Product />
+      <Nav query={query} handleInputField={handleInputField} />
+      <Recommended handleClick={handleClick} />
+      <Product result={result} />
     </div>
   );
 }

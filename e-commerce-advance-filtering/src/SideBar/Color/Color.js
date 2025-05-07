@@ -7,7 +7,7 @@ export default function Color({ handleCategory }) {
     <div>
       <h2 className="sidebar-title color-title">Colors</h2>
       <label className="sidebar-label-container">
-        <input onChange={handleCategory} type="radio" name="test3" />
+        <input onChange={handleCategory} type="radio" name="test3" value="" />
         <span className="checkmark all"></span>
         All
       </label>

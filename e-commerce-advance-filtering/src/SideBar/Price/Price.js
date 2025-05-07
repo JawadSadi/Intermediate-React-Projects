@@ -7,7 +7,7 @@ export default function Price({ handleCategory }) {
     <div className="ml">
       <h2 className="sidebar-title price-title">Price</h2>
       <label className="sidebar-label-container">
-        <input onChange={handleCategory} type="radio" name="test2" />
+        <input onChange={handleCategory} type="radio" name="test2" value="" />
         <span className="checkmark"></span>
         All
       </label>

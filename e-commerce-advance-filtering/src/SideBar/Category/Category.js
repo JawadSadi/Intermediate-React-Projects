@@ -7,7 +7,7 @@ export default function Category({ handleCategory }) {
     <div>
       <h2 className="sidebar-title">Category</h2>
       <label className="sidebar-label-container">
-        <input onChange={handleCategory} type="radio" name="test" />
+        <input onChange={handleCategory} type="radio" name="test" value="" />
         <span className="checkmark"></span>
         All
       </label>
@@ -19,8 +19,8 @@ export default function Category({ handleCategory }) {
       />{" "}
       <Input
         name={"test"}
-        title={"Falts"}
-        value={"falts"}
+        title={"Flats"}
+        value={"flats"}
         handleCategory={handleCategory}
       />{" "}
       <Input
